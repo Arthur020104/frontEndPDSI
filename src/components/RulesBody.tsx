@@ -12,23 +12,39 @@ type BackendResponse = Rule[];
 
 function backendPlaceholder(): Promise<BackendResponse> 
 {
-  const commonRules = [
-    'Respeitar o horário de silêncio, das 22h às 8h.',
-    'É proibido jogar lixo ou qualquer objeto pelas janelas ou em áreas comuns.',
-    'As vagas de garagem são de uso exclusivo dos moradores do apartamento correspondente.',
-    'Animais de estimação devem ser mantidos na coleira e acompanhados em todas as áreas comuns.',
-    'A velocidade máxima para veículos dentro do condomínio é de 10 km/h.',
-    'Respeitar e venerar a religião Machado 98, conforme estabelecido na convenção do condomínio.',
-  ];
 
-  const rulesData = commonRules.map(ruleText => (
-{
-    str: ruleText,
-    date: '10/02/2024',
-    creator: 'Pastor Alirio',
-  }));
-
-  return Promise.resolve(rulesData);
+    return Promise.resolve([
+        {
+            str: 'Respeitar o horário de silêncio, das 22h às 8h.',
+            date: '10/02/2024',
+            creator: 'Pastor Alirio',
+        },
+        {
+            str: 'É proibido jogar lixo ou qualquer objeto pelas janelas ou em áreas comuns.',
+            date: '10/02/2024',
+            creator: 'Pastor Alirio',
+        },
+        {
+            str: 'As vagas de garagem são de uso exclusivo dos moradores do apartamento correspondente.',
+            date: '10/02/2024',
+            creator: 'Pastor Alirio',
+        },
+        {
+            str: 'Animais de estimação devem ser mantidos na coleira e acompanhados em todas as áreas comuns.',
+            date: '10/02/2024',
+            creator: 'Pastor Alirio',
+        },
+        {
+            str: 'A velocidade máxima para veículos dentro do condomínio é de 10 km/h.',
+            date: '10/02/2024',
+            creator: 'Pastor Alirio',
+        },
+        {
+            str: 'Respeitar e venerar a religião Machado 98, conforme estabelecido na convenção do condomínio.',
+            date: '10/02/2024',
+            creator: 'Pastor Alirio',
+        },
+    ]);
 }
 
 interface RulesBodyProps 

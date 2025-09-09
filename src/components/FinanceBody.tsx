@@ -4,10 +4,10 @@ import { Card } from './Card';
 
 type Installment =
 {
-  codestr: string;
+  code: string;
   installmentStatus: 'Pago' | 'Pendente' | 'Atrasado';
   totalValue: number;
-  dateOfEmission: string;
+  dueDate: string;
   datePaid: string | null;
 };
 
@@ -17,24 +17,24 @@ function backendPlaceholder(): Promise<BackendResponse>
 {
   return Promise.resolve([
     {
-      codestr: 'CONDO-001',
+      code: 'CONDO-001',
       installmentStatus: 'Pago',
       totalValue: 450.5,
-      dateOfEmission: '01/08/2025',
+      dueDate: '01/08/2025',
       datePaid: '05/08/2025',
     },
     {
-      codestr: 'EXTRA-002',
+      code: 'EXTRA-002',
       installmentStatus: 'Pendente',
       totalValue: 120.0,
-      dateOfEmission: '01/09/2025',
+      dueDate: '01/09/2025',
       datePaid: null,
     },
     {
-      codestr: 'CONDO-003',
+      code: 'CONDO-003',
       installmentStatus: 'Atrasado',
       totalValue: 450.5,
-      dateOfEmission: '01/07/2025',
+      dueDate: '01/07/2025',
       datePaid: null,
     },
   ]);
@@ -93,9 +93,9 @@ export const FinanceBody: React.FC<FinanceBodyProps> = ({ styleTitle }) =>
       
       {installments
         .slice()
-        .sort((a, b) => (a.dateOfEmission < b.dateOfEmission ? 1 : -1))
+        .sort((a, b) => (a.dueDate < b.dueDate ? 1 : -1))
         .map(inst => (
-          <Card key={inst.codestr} title={`Parcela: ${inst.codestr}`}>
+          <Card key={inst.code} title={`Parcela: ${inst.code}`}>
             <View style={styles.installmentCardContent}>
               <View style={styles.installmentDetails}>
                 <View style={styles.installmentRow}>
@@ -105,8 +105,8 @@ export const FinanceBody: React.FC<FinanceBodyProps> = ({ styleTitle }) =>
                 </Text>
               </View>
               <View style={styles.installmentRow}>
-                <Text style={styles.installmentLabel}>Emissão:</Text>
-                <Text style={styles.installmentInfo}>{inst.dateOfEmission}</Text>
+                <Text style={styles.installmentLabel}>Data de Vencimento:</Text>
+                <Text style={styles.installmentInfo}>{inst.dueDate}</Text>
               </View>
               <View style={styles.installmentRow}>
                 <Text style={styles.installmentLabel}>Pagamento:</Text>
