@@ -29,6 +29,12 @@ export interface CondominiumCreateData
     owner_id: number;
   };
 }
+export interface CondominiumLinkData
+{
+  message: string;
+  user: { id: number };
+  condominium: CondominiumCreateData['condominium'];
+}
 
 
 export default function LinkCondominiumScreen()
@@ -37,6 +43,7 @@ export default function LinkCondominiumScreen()
   const [condominiumToken, setCondominiumToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState<any>(null);
+
   async function createCondominium(name: string)
   {
     try
@@ -54,20 +61,19 @@ export default function LinkCondominiumScreen()
   {
     if (!token.trim())
     {
-      Alert.alert('Erro', 'Digite o token do condomínio');
-      return false;
+      return {'state': false, 'linkData': null};
     }
-    if (loading) { return false; }
+    if (loading) { return {'state': false, 'linkData': null}; }
 
     try
     {
       setLoading(true);
 
       const userToken = user.token;
-
+      let data: CondominiumLinkData;
       try
       {
-        await fetchAPI('/condominios/link', 'POST',
+        data = await fetchAPI('/condominios/link', 'POST',
         {
           user_token: userToken,
           condominium_token: token.trim().toUpperCase()
@@ -75,24 +81,16 @@ export default function LinkCondominiumScreen()
       }
       catch (e: any)
       {
-        Alert.alert('Erro', e?.message || 'Não foi possível vincular o condomínio');
-        return false;
+        return {'state': false, 'linkData': null};
       }
 
-      const updatedUser = {
-        ...user,
-        condominium_token: token.trim().toUpperCase()
-      };
-      await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
 
-      Alert.alert('Sucesso', 'Condomínio vinculado com sucesso!');
-      navigation.navigate('Home');
-      return true;
+      return {'state': true, 'linkData': data};
     }
     catch (err: any)
     {
-      Alert.alert('Erro', 'Falha ao vincular. Verifique sua conexão.');
-      return false;
+      
+      return {'state': false, 'linkData': null};
     }
     finally
     {
@@ -120,7 +118,8 @@ export default function LinkCondominiumScreen()
 
   const handleLink = async () =>
   {
-    const state: boolean = await linkCondominium(condominiumToken, userData);
+    let { state, linkData } = await linkCondominium(condominiumToken, userData);
+    state ? Alert.alert('Sucesso', 'Condomínio vinculado com sucesso!') : Alert.alert('Erro', 'Token inválido ou erro ao conectar ao servidor.');
     if(!state)
     {
       let create = null
@@ -137,8 +136,20 @@ export default function LinkCondominiumScreen()
           );
         });
       }
-      if(create){ await linkCondominium(create!.condominium.token, userData); }
+      if(create){ ({ state, linkData } =  await linkCondominium(create!.condominium.token, userData)); }
     }
+
+    if(state && linkData)
+    {
+      const updatedUser = {
+        ...userData,
+        condominium: linkData.condominium,
+        condominium_token: linkData.condominium.token.trim().toUpperCase()
+      };
+      await AsyncStorage.setItem('@user', JSON.stringify(updatedUser));
+      navigation.navigate('Home');
+    }
+    
   };
   useEffect(() => 
   {

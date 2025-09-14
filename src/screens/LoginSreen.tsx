@@ -52,7 +52,7 @@ export default function LoginScreen({ navigation }: Props)
       try
       {
         await AsyncStorage.setItem('@user', JSON.stringify({ token: data.token, email: data.email, username: data.name, role: data.role }));
-        const meData = await fetchAPI('/me');
+        const meData = await fetchAPI('/auth/me');
         if (meData && meData.isLinked)
         {
           navigation.navigate('Home');
