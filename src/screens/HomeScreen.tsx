@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,8 @@ import { ReservationBody} from '../components/ReservationBody';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RulesBody } from '../components/RulesBody';
 import { FinanceBody } from '../components/FinanceBody';
+import { OccurrenceBody } from '../components/OccurrenceBody';
+import type { OccurrenceBodyHandle } from '../components/OccurrenceBody';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props 
@@ -34,6 +36,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const [selectedMenu, setSelectedMenu] = useState(menuOptions[0].label);
   const [userData, setUserData] = useState<any>(null);
+  const occurrenceRef = useRef<OccurrenceBodyHandle>(null);
 
   useEffect(() => 
   {
@@ -71,7 +74,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
      <View style={styles.root}>
-      <Header username={userData?.username} navigation={navigation} />
+  <Header username={userData?.username} navigation={navigation} />
 
       {/* Carrossel horizontal */}
       <ScrollView>
@@ -99,7 +102,8 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           {selectedMenu === 'Denúncia' && (
-            <Text style={styles.placeholder}>Formulário de denúncia</Text>
+            <OccurrenceBody ref={occurrenceRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'}
+            />
           )}
 
           {selectedMenu === 'Financeiro' && (
@@ -111,6 +115,16 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
+
+      {selectedMenu === 'Denúncia' && (
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => occurrenceRef.current?.openCreateModal()}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -153,5 +167,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
 
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#0058A3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    zIndex: 10,
+  },
+  fabText: {
+    color: '#fff',
+    fontSize: 30,
+    marginTop: -2,
   },
 });

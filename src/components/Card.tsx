@@ -2,15 +2,21 @@ import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 
 interface CardProps {
-  title: string;
+  title: React.ReactNode;
   children?: React.ReactNode;
   style?: ViewStyle;
 }
 
 export const Card: React.FC<CardProps> = ({ title, children, style }) => {
   return (
-    <View style={[styles.card, style]}>    
-      <Text style={styles.cardTitle}>{title}</Text>
+    <View style={[styles.card, style]}>
+      <View style={styles.header}>
+        {typeof title === 'string' ? (
+          <Text style={styles.cardTitle}>{title}</Text>
+        ) : (
+          title
+        )}
+      </View>
       <View style={styles.content}>{children}</View>
     </View>
   );
@@ -31,10 +37,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e0e0e0'
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 0,
   },
   content: {
     // space for children
