@@ -12,6 +12,7 @@ import { Header } from '../components/Header';
 import { ReservationBody} from '../components/ReservationBody';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RulesBody } from '../components/RulesBody';
+import type { RulesBodyHandle } from '../components/RulesBody';
 import { FinanceBody } from '../components/FinanceBody';
 import { OccurrenceBody } from '../components/OccurrenceBody';
 import type { OccurrenceBodyHandle } from '../components/OccurrenceBody';
@@ -37,6 +38,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [selectedMenu, setSelectedMenu] = useState(menuOptions[0].label);
   const [userData, setUserData] = useState<any>(null);
   const occurrenceRef = useRef<OccurrenceBodyHandle>(null);
+  const rulesRef = useRef<RulesBodyHandle>(null);
 
   useEffect(() => 
   {
@@ -102,7 +104,10 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           {selectedMenu === 'Denúncia' && (
-            <OccurrenceBody ref={occurrenceRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'}
+            <OccurrenceBody
+              ref={occurrenceRef}
+              styleTitle={styles.titleComponent}
+              isSyndic={userData?.role === 'syndic'}
             />
           )}
 
@@ -111,7 +116,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           {selectedMenu === 'Regras' && (
-            <RulesBody styleTitle={styles.titleComponent} />
+            <RulesBody ref={rulesRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
           )}
         </View>
       </ScrollView>
@@ -121,6 +126,16 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.fab}
           activeOpacity={0.9}
           onPress={() => occurrenceRef.current?.openCreateModal()}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      )}
+
+      {selectedMenu === 'Regras' && userData?.role === 'syndic' && (
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => rulesRef.current?.openCreateModal()}
         >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>

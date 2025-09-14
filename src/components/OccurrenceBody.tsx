@@ -72,7 +72,7 @@ async function disableOcurrence(id: number): Promise<void>
 		console.error(err);
 	}
 }
-function formatDate(iso: string): string
+export function formatDate(iso: string): string
 {
 	const d = new Date(iso);
 	const dd = String(d.getDate()).padStart(2, '0');
@@ -203,7 +203,7 @@ export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyPro
 
 const styles = StyleSheet.create(
 {
-	  container:
+	container:
 	{
 			width: '100%'
 	},
