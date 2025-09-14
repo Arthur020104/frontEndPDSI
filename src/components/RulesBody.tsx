@@ -1,12 +1,14 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, StyleProp, TextStyle, TouchableOpacity, Modal, TextInput, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Card } from './Card';
 import { formatDate } from './OccurrenceBody';
 import { fetchAPI } from '../screens/services/api';
 
 type Rule = 
 {
+  id: number;
   str: string;
   date: string;
   creator: string;
@@ -22,6 +24,7 @@ async function fetchRules(): Promise<BackendResponse>
   for(const item of data)
   {
     rules.push({
+  id: item.id,
       str: item.descricao,
       date: formatDate(item.created_at),
       creator: item.user?.username || 'NONE'
@@ -43,7 +46,20 @@ async function createRule(desc: string): Promise<boolean>
     return false;
   }
 }
-
+async function deleteRule(id: number): Promise<boolean>
+{
+  try
+  {
+    await fetchAPI(`/rules/${id}`, 'DELETE');
+    return true;
+  }
+  catch (error)
+  {
+    Alert.alert('Erro', 'Não foi possível deletar a regra');
+    console.error('Error deleting rule:', error);
+    return false;
+  }
+}
 
 interface RulesBodyProps 
 {
@@ -77,8 +93,7 @@ export const RulesBody = forwardRef<RulesBodyHandle, RulesBodyProps>(function Ru
       Alert.alert('Atenção', 'Descreva a nova regra.');
       return;
     }
-    
-    const success = createRule(desc);
+    const success = await createRule(desc);
     if (!success) return;
     setNewDesc('');
     setShowModal(false);
@@ -100,8 +115,23 @@ export const RulesBody = forwardRef<RulesBodyHandle, RulesBodyProps>(function Ru
       <Text style={[styles.title, styleTitle]}>Regras do Condomínio</Text>
 
       {rules.map((rule, index) => (
-        
-        <Card key={index} title={`Regra #${index + 1}`}>
+        <Card
+          key={rule.id ?? index}
+          title={
+            <View style={styles.headerRow}>
+              <Text style={styles.cardTitleText} numberOfLines={1} ellipsizeMode="tail">{`Regra #${index + 1}`}</Text>
+              {isSyndic && (
+                <TouchableOpacity onPress={async() => 
+                {
+                  await deleteRule(rule.id);
+                  loadData();
+                }}>
+                  <Icon name="trash-can-outline" size={20} color="#E53935" />
+                </TouchableOpacity>
+              )}
+            </View>
+          }
+        >
           <View style={styles.ruleContent}>
             <Text style={styles.ruleText}>"{rule.str}"</Text>
             <Text style={styles.ruleMeta}>
@@ -178,6 +208,22 @@ const styles = StyleSheet.create(
     color: '#777',
     marginTop: 12,
     textAlign: 'right',
+  },
+  headerRow:
+  {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    width: '100%'
+  },
+  cardTitleText:
+  {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    flex: 1,
+    marginRight: 8
   },
   modalOverlay:
   {

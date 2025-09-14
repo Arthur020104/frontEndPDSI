@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, StyleProp, TextStyle } from 'react-native';
 import { Card } from './Card';
-
+import { fetchAPI } from '../screens/services/api'; 
+import { formatDate } from './OccurrenceBody';
 type Installment =
 {
   code: string;
@@ -13,31 +14,30 @@ type Installment =
 
 type BackendResponse = Installment[];
 
-function backendPlaceholder(): Promise<BackendResponse>
+async function fetchInstallments(): Promise<BackendResponse>
 {
-  return Promise.resolve([
+  try
+  {
+    const data = await fetchAPI('/financeiro');
+    const installments: BackendResponse = [];
+    for (const item of data)
     {
-      code: 'CONDO-001',
-      installmentStatus: 'Pago',
-      totalValue: 450.5,
-      dueDate: '01/08/2025',
-      datePaid: '05/08/2025',
-    },
-    {
-      code: 'EXTRA-002',
-      installmentStatus: 'Pendente',
-      totalValue: 120.0,
-      dueDate: '01/09/2025',
-      datePaid: null,
-    },
-    {
-      code: 'CONDO-003',
-      installmentStatus: 'Atrasado',
-      totalValue: 450.5,
-      dueDate: '01/07/2025',
-      datePaid: null,
-    },
-  ]);
+      installments.push({
+        code: item.code,
+        installmentStatus: item.pago_em ? 'Pago' : (new Date(item.vencimento) < new Date() ? 'Atrasado' : 'Pendente'),
+        totalValue: (item.valor || 0),
+        dueDate: formatDate(item.vencimento),
+        datePaid: item.pago_em ? formatDate(item.pago_em) : null,
+      });
+      console.log(item);
+    }
+    return installments;
+  }
+  catch (e: any)
+  {
+    console.error('Erro ao carregar financeiro:', e?.message || e);
+    return [];
+  }
 }
 
 interface FinanceBodyProps
@@ -51,7 +51,11 @@ export const FinanceBody: React.FC<FinanceBodyProps> = ({ styleTitle }) =>
 
   useEffect(() =>
   {
-    backendPlaceholder().then(setInstallments);
+    (async () =>
+    {
+      const data = await fetchInstallments();
+      setInstallments(data);
+    })();
   }, []);
 
   const summary = useMemo(() =>
@@ -59,10 +63,14 @@ export const FinanceBody: React.FC<FinanceBodyProps> = ({ styleTitle }) =>
     const pendingOrLate = installments.filter(
       inst => inst.installmentStatus === 'Pendente' || inst.installmentStatus === 'Atrasado'
     );
+    for(let item of installments)
+    {
+      console.log(item.totalValue);
 
-    const totalPendingValue = pendingOrLate.reduce((sum, inst) => sum + inst.totalValue, 0);
+    }
+    const totalPendingValue = pendingOrLate.reduce((sum, inst) => sum + Number(inst.totalValue || 0), 0);
     const isOverdue = pendingOrLate.some(inst => inst.installmentStatus === 'Atrasado');
-
+    console.log(totalPendingValue, isOverdue);
     return {
       totalPendingValue,
       count: pendingOrLate.length,
@@ -79,7 +87,7 @@ export const FinanceBody: React.FC<FinanceBodyProps> = ({ styleTitle }) =>
           <View>
             <Text style={styles.summaryLabel}>Valor Total Pendente</Text>
             <Text style={[styles.summaryValue, summary.isOverdue && styles.summaryValueOverdue]}>
-              R$ {summary.totalPendingValue.toFixed(2).replace('.', ',')}
+              R$ {summary.totalPendingValue.toString().replace('.', ',')}
             </Text>
           </View>
           <View style={styles.summaryCountContainer}>
@@ -101,7 +109,7 @@ export const FinanceBody: React.FC<FinanceBodyProps> = ({ styleTitle }) =>
                 <View style={styles.installmentRow}>
                 <Text style={styles.installmentLabel}>Valor:</Text>
                 <Text style={styles.installmentValue}>
-                  R$ {inst.totalValue.toFixed(2).replace('.', ',')}
+                  R$ {inst.totalValue.toString().replace('.', ',')}
                 </Text>
               </View>
               <View style={styles.installmentRow}>
