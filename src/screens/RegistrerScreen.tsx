@@ -11,28 +11,53 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { fetchAPI } from './services/api';
 
 interface Props {
   navigation: any;
 }
 
-export default function RegisterScreen({ navigation }: Props) {
+export default function RegisterScreen({ navigation }: Props)
+{
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isSyndic, setIsSyndic] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    if (!username || !email || !password) {
+  const handleRegister = async () =>
+  {
+    if (!username || !email || !password)
+    {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
-    Alert.alert('Sucesso', `Usuário ${username} registrado!`);
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    navigation.navigate('Login');
+    if (loading) { return; }
+
+    try
+    {
+      setLoading(true);
+      await fetchAPI('/auth/register', 'POST',
+      {
+        name: username,
+        email,
+        password,
+        role: isSyndic ? 'syndic' : 'resident'
+      });
+      Alert.alert('Sucesso', 'Conta criada com sucesso!');
+      navigation.navigate('Login');
+    }
+    catch (err: any)
+    {
+      Alert.alert('Erro', err?.message || 'Não foi possível conectar ao servidor');
+    }
+    finally
+    {
+      setLoading(false);
+    }
   };
 
   return (
@@ -80,8 +105,27 @@ export default function RegisterScreen({ navigation }: Props) {
             />
           </View>
 
-          <TouchableOpacity style={styles.button} onPress={handleRegister}>
-            <Text style={styles.buttonText}>Registrar</Text>
+          <View style={styles.adminRow}>
+            <TouchableOpacity
+              style={[styles.adminToggle, isSyndic && styles.adminToggleActive]}
+              onPress={() => setIsSyndic(!isSyndic)}
+              activeOpacity={0.85}
+            >
+              <Icon name="crown" size={16} color={isSyndic ? '#fff' : '#888'} />
+            </TouchableOpacity>
+            <Text style={styles.adminLabel}>Sou síndico (admin)</Text>
+          </View>
+
+          <TouchableOpacity
+            style={[styles.button, loading && { opacity: 0.7 }]}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#ffffff" />
+            ) : (
+              <Text style={styles.buttonText}>Registrar</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -155,5 +199,31 @@ const styles = StyleSheet.create({
     color: '#2980b9',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  adminRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: 4,
+  },
+  adminToggle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    elevation: 2,
+  },
+  adminToggleActive: {
+    backgroundColor: '#2980b9',
+    borderColor: '#2980b9',
+  },
+  adminLabel: {
+    fontSize: 14,
+    color: '#2c3e50',
   },
 });

@@ -6,7 +6,7 @@ import RegisterScreen from './src/screens/RegistrerScreen';
 import LoginScreen from './src/screens/LoginSreen';
 import HomeScreen from './src/screens/HomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
-
+import LinkCondominiumScreen from './src/screens/LinkCondominium';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -33,7 +33,13 @@ export default function App() {
           component={ProfileScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name = "LinkCondominium"
+          component = {LinkCondominiumScreen}
+          options = {{ headerShown: false }}
+        />
       </Stack.Navigator>
+      
     </NavigationContainer>
   );
 }

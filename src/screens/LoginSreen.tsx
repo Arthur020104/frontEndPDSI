@@ -13,22 +13,68 @@ import {
   Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchAPI } from './services/api';
 
 interface Props {
   navigation: any;
 }
 
-export default function LoginScreen({ navigation }: Props) {
+export default function LoginScreen({ navigation }: Props)
+{
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (!email || !password) {
+  const handleLogin = async () =>
+  {
+    if (!email || !password)
+    {
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
-    Alert.alert('Sucesso', `Logado com: ${email}`);
-    navigation.navigate('Home');
+    if (loading) { return; }
+
+    try
+    {
+      setLoading(true);
+      let data: any = null;
+      try
+      {
+        data = await fetchAPI('/auth/login', 'POST', { email, password });
+      }
+      catch (e: any)
+      {
+        Alert.alert('Erro', e?.message || 'Erro ao fazer login');
+        return;
+      }
+
+      try
+      {
+        await AsyncStorage.setItem('@user', JSON.stringify({ token: data.token, email: data.email, username: data.name, role: data.role }));
+        const meData = await fetchAPI('/me');
+        if (meData && meData.isLinked)
+        {
+          navigation.navigate('Home');
+        }
+        else
+        {
+          navigation.navigate('LinkCondominium');
+        }
+      }
+      catch (e)
+      {
+        navigation.navigate('LinkCondominium');
+      }
+    }
+    catch (err)
+    {
+      Alert.alert('Erro', 'Não foi possível conectar ao servidor');
+    }
+    finally
+    {
+      setLoading(false);
+    }
   };
 
   return (
