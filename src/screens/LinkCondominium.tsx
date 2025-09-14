@@ -99,23 +99,6 @@ export default function LinkCondominiumScreen()
     }
   }
 
-  useEffect(() =>
-  {
-    const checkIfLinked = async () =>
-    {
-      const userString = await AsyncStorage.getItem('@user');
-      if (userString)
-      {
-        const user = JSON.parse(userString);
-        if (user.condominium_token)
-        {
-          navigation.navigate('Home');
-        }
-      }
-    };
-    checkIfLinked();
-  }, [navigation]);
-
   const handleLink = async () =>
   {
     let { state, linkData } = await linkCondominium(condominiumToken, userData);

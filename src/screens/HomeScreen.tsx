@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from 'react-native';
 import { Header } from '../components/Header';
 import { ReservationBody} from '../components/ReservationBody';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RulesBody } from '../components/RulesBody';
 import { FinanceBody } from '../components/FinanceBody';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props 
 {
@@ -31,6 +33,27 @@ const cardWidth = 90;
 export const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   const [selectedMenu, setSelectedMenu] = useState(menuOptions[0].label);
+  const [userData, setUserData] = useState<any>(null);
+
+  useEffect(() => 
+  {
+    const loadUserData = async () => 
+    {
+      const userString = await AsyncStorage.getItem('@user');
+      if (!userString) 
+      {
+        Alert.alert('Erro', 'Usuário não logado. Faça login novamente.');
+        navigation.navigate('Login');
+        return;
+      }
+      const user = JSON.parse(userString);
+      setUserData(user);
+      console.log('User Data:', user);
+    };
+
+    loadUserData();
+  }, [navigation]);
+
 
   const renderMenuItem = ({ item }: any) => {
     const isSelected = item.label === selectedMenu;
@@ -48,7 +71,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
   return (
      <View style={styles.root}>
-      <Header username="Usuário de Teste" navigation={navigation} />
+      <Header username={userData?.username} navigation={navigation} />
 
       {/* Carrossel horizontal */}
       <ScrollView>
