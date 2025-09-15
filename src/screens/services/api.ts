@@ -41,3 +41,10 @@ export async function fetchAPI(endpoint: string, method = 'GET', body?: any)
 
   return data;
 }
+
+
+
+export function getImageUrl(imageId: number | string): string
+{
+  return `${API_URL}/images/${imageId}`;
+}

@@ -97,7 +97,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
         {/* Conteúdo dinâmico */}
         <View style={styles.scrollContent}>
           {selectedMenu === 'Reservas' && (
-            <ReservationBody styleTitle={styles.titleComponent} />
+            <ReservationBody styleTitle={styles.titleComponent} userId={userData?.id} isSyndic={userData?.role === 'syndic'} />
           )}
 
           {selectedMenu === 'Câmeras' && (
