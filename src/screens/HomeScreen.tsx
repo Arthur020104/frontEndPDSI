@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Alert,
   SafeAreaView,
+  ScrollView,
+  Image,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -100,8 +102,36 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
 
       {/* Conteúdo principal */}
       <View style={styles.contentContainer}>
-        {selectedMenu === 'Reservas' && <ReservationBody styleTitle={styles.titleComponent} />}
-        {selectedMenu === 'Câmeras' && <Text style={styles.placeholder}>Visualização das câmeras</Text>}
+        {selectedMenu === 'Reservas' && (
+          <ScrollView style={{ flex: 1 }}>
+            <ReservationBody styleTitle={styles.titleComponent} />
+          </ScrollView>
+        )}
+
+        {selectedMenu === 'Câmeras' && (
+          <ScrollView style={{ flex: 1 }}>
+            <View style={styles.cameraContainer}>
+              <Text style={styles.cameraTitle}>Visualização das Câmeras</Text>
+              <View style={styles.cameraGrid}>
+                {[
+                  'https://images.unsplash.com/photo-1602524813757-02f31d74f73c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
+                  'https://images.unsplash.com/photo-1597764693626-9731f469fa0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
+                  'https://images.unsplash.com/photo-1601562129320-96f3f62edb36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
+                  'https://images.unsplash.com/photo-1613788381897-4c88d47d0b0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
+                ].map((uri, index) => (
+                  <View key={index} style={styles.fakeCamera}>
+                    <Image
+                      source={{ uri }}
+                      style={{ width: '100%', height: '100%', borderRadius: 16 }}
+                      resizeMode="cover"
+                    />
+                  </View>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+        )}
+
         {selectedMenu === 'Avisos' && (
           <NoticesBody
             ref={noticesRef}
@@ -109,35 +139,72 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
             filter={filterToday ? 'today' : 'all'}
           />
         )}
+
         {selectedMenu === 'Denúncia' && (
-          <OccurrenceBody ref={occurrenceRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
+          <ScrollView style={{ flex: 1 }}>
+            <OccurrenceBody
+              ref={occurrenceRef}
+              styleTitle={styles.titleComponent}
+              isSyndic={userData?.role === 'syndic'}
+            />
+          </ScrollView>
         )}
+
         {selectedMenu === 'Financeiro' && (
-          <FinanceBody ref={financeRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
+          <ScrollView style={{ flex: 1 }}>
+            <FinanceBody
+              ref={financeRef}
+              styleTitle={styles.titleComponent}
+              isSyndic={userData?.role === 'syndic'}
+            />
+          </ScrollView>
         )}
+
         {selectedMenu === 'Regras' && (
-          <RulesBody ref={rulesRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
+          <ScrollView style={{ flex: 1 }}>
+            <RulesBody
+              ref={rulesRef}
+              styleTitle={styles.titleComponent}
+              isSyndic={userData?.role === 'syndic'}
+            />
+          </ScrollView>
         )}
       </View>
 
       {/* FABs */}
       {selectedMenu === 'Denúncia' && (
-        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => occurrenceRef.current?.openCreateModal()}>
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => occurrenceRef.current?.openCreateModal()}
+        >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
       {selectedMenu === 'Avisos' && userData?.role === 'syndic' && (
-        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => noticesRef.current?.openCreateModal()}>
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => noticesRef.current?.openCreateModal()}
+        >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
       {selectedMenu === 'Regras' && userData?.role === 'syndic' && (
-        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => rulesRef.current?.openCreateModal()}>
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => rulesRef.current?.openCreateModal()}
+        >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
       {selectedMenu === 'Financeiro' && userData?.role === 'syndic' && (
-        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => financeRef.current?.openCreateModal()}>
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => financeRef.current?.openCreateModal()}
+        >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
@@ -161,15 +228,9 @@ const styles = StyleSheet.create({
   menuCardSelected: { backgroundColor: '#2e59d9' },
   menuLabel: { color: '#fff', marginTop: 6, fontSize: 12, textAlign: 'center' },
   contentContainer: { flex: 1, paddingHorizontal: 16, paddingTop: 8 },
-  placeholder: {
-    fontSize: 16,
-    padding: 16,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
   titleComponent: { fontSize: 25, fontWeight: '400', marginBottom: 12, textAlign: 'center', color: '#333' },
+
+  // FAB
   fab: {
     position: 'absolute',
     right: 20,
@@ -184,4 +245,23 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   fabText: { color: '#fff', fontSize: 30, marginTop: -2 },
+
+  // Câmeras
+  cameraContainer: { flex: 1, padding: 16 },
+  cameraTitle: { fontSize: 22, fontWeight: '700', marginBottom: 16, color: '#0058A3', textAlign: 'center' },
+  cameraGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  fakeCamera: {
+    width: '48%',
+    height: 150,
+    backgroundColor: '#e0e4e8',
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
 });
