@@ -37,6 +37,7 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
   const [filterToday, setFilterToday] = useState(false);
 
   const occurrenceRef = useRef<any>(null);
+  const reservationRef = useRef<any>(null);
   const rulesRef = useRef<any>(null);
   const financeRef = useRef<any>(null);
   const noticesRef = useRef<NoticesBodyHandle>(null);
@@ -102,9 +103,9 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
 
       {/* Conteúdo principal */}
       <View style={styles.contentContainer}>
-        {selectedMenu === 'Reservas' && (
+    {selectedMenu === 'Reservas' && (
           <ScrollView style={{ flex: 1 }}>
-            <ReservationBody styleTitle={styles.titleComponent}userId={userData?.id} isSyndic={userData?.role === 'syndic'} />
+      <ReservationBody ref={reservationRef} styleTitle={styles.titleComponent} userId={userData?.id} isSyndic={userData?.role === 'syndic'} />
           </ScrollView>
         )}
 
@@ -195,6 +196,15 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
           style={styles.fab}
           activeOpacity={0.9}
           onPress={() => rulesRef.current?.openCreateModal()}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      )}
+      {selectedMenu === 'Reservas' && userData?.role === 'syndic' && (
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => reservationRef.current?.openCreateModal()}
         >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>

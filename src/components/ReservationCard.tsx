@@ -21,7 +21,7 @@ export interface ReservationCardProps
   nome: string;
   image_id: number;
   descricao: string;
-  currentUserId: number;
+  userId: number;
 }
 
 type Schedule = { id: number; inicio: string; fim: string; user_id: number; reserva_id: number; username: string; };
@@ -88,8 +88,7 @@ export function ReservationCard(props: ReservationCardProps)
     const m: {[k: string]: any} = {};
     for (const [k, arr] of Object.entries(grouped))
     {
-      const number = 15;;
-      const hasId = arr.some(x => x.user_id === number);
+      const hasId = arr.some(x => x.user_id === props.userId);
       if (hasId)
       {
         m[k] = 

@@ -19,15 +19,18 @@ export async function fetchAPI(endpoint: string, method = 'GET', body?: any)
     catch (_) {}
   }
 
+  const isForm = (typeof FormData !== 'undefined') && (body instanceof FormData);
+  const headers: Record<string, string> =
+  {
+    ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  };
+
   const res = await fetch(`${API_URL}${endpoint}`,
   {
     method,
-    headers:
-    {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    },
-    body: body ? JSON.stringify(body) : undefined
+    headers,
+    body: body ? (isForm ? body : JSON.stringify(body)) : undefined
   });
 
   let data: any = null;
