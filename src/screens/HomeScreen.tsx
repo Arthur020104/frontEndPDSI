@@ -115,10 +115,10 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
               <Text style={styles.cameraTitle}>Visualização das Câmeras</Text>
               <View style={styles.cameraGrid}>
                 {[
-                  'https://images.unsplash.com/photo-1602524813757-02f31d74f73c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
-                  'https://images.unsplash.com/photo-1597764693626-9731f469fa0f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
-                  'https://images.unsplash.com/photo-1601562129320-96f3f62edb36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
-                  'https://images.unsplash.com/photo-1613788381897-4c88d47d0b0c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400',
+                  'https://lh3.googleusercontent.com/gps-cs-s/AC9h4np7MZf-BcdtQPoOZQVyjxyxnGGxqn-E98AOXG5BoZcXia8iLEB_JMe6Ya-jB6BuKU-b21iIKH2dbxYVIwd3C1eW8YldFRzXbmUPwxdz0dF2zuwZ_Ft9V0RoxwCWKAI5qoq5YeMNcw=s1360-w1360-h1020-rw',
+                  'https://lh3.googleusercontent.com/gps-cs-s/AC9h4nrlY7of7DdyQmOuP67z4oj0UmqQlRfA-V49f4ECd_pDrCSN0I0-UrXkPibKVViCdq8yNsBwMGvBHJ1WsTiDfxsC_mOmnHnwBYVMXA_dtRs5Nk0iarD3MQajClfYf_8fOh3-f3Ni=s1360-w1360-h1020-rw',
+                  'https://lh3.googleusercontent.com/gps-cs-s/AC9h4nrUWAoRVUiPBV_AHnlUUHfb4ELuBOLItLD1Ofy5OX0I4IMMXsJ9m6fwV1i3WjKQROfJrudQ7jip4s4qvv9h-0F4g9NzPWrD7DWszUfifuJjMMubhCdDfNp92iRSr_tmleoGYHA=s1360-w1360-h1020-rw',
+                  'https://lh3.googleusercontent.com/gps-cs-s/AC9h4npcV3Gg9_0zBjrTD57zIDRtq4_9DkzXvTV8eJ7WwM7rgYLOZ_4gUX_r85BHTMx_l25lKHmM3kdgZg28bEQOjTfDHSfjfHgDOi05THFVdaeRW4etmOJfByKH5qhlpZZ6tO97N-reMQ=s1360-w1360-h1020-rw',
                 ].map((uri, index) => (
                   <View key={index} style={styles.fakeCamera}>
                     <Image
