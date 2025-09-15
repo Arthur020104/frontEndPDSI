@@ -14,6 +14,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RulesBody } from '../components/RulesBody';
 import type { RulesBodyHandle } from '../components/RulesBody';
 import { FinanceBody } from '../components/FinanceBody';
+import type { FinanceBodyHandle } from '../components/FinanceBody';
 import { OccurrenceBody } from '../components/OccurrenceBody';
 import type { OccurrenceBodyHandle } from '../components/OccurrenceBody';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,6 +40,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const [userData, setUserData] = useState<any>(null);
   const occurrenceRef = useRef<OccurrenceBodyHandle>(null);
   const rulesRef = useRef<RulesBodyHandle>(null);
+  const financeRef = useRef<FinanceBodyHandle>(null);
 
   useEffect(() => 
   {
@@ -112,7 +114,7 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           {selectedMenu === 'Financeiro' && (
-            <FinanceBody styleTitle={styles.titleComponent} />
+            <FinanceBody ref={financeRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
           )}
 
           {selectedMenu === 'Regras' && (
@@ -136,6 +138,16 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           style={styles.fab}
           activeOpacity={0.9}
           onPress={() => rulesRef.current?.openCreateModal()}
+        >
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      )}
+
+      {selectedMenu === 'Financeiro' && userData?.role === 'syndic' && (
+        <TouchableOpacity
+          style={styles.fab}
+          activeOpacity={0.9}
+          onPress={() => financeRef.current?.openCreateModal()}
         >
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
