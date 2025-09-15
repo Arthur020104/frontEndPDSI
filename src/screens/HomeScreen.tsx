@@ -104,7 +104,7 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
       <View style={styles.contentContainer}>
         {selectedMenu === 'Reservas' && (
           <ScrollView style={{ flex: 1 }}>
-            <ReservationBody styleTitle={styles.titleComponent} />
+            <ReservationBody styleTitle={styles.titleComponent}userId={userData?.id} isSyndic={userData?.role === 'syndic'} />
           </ScrollView>
         )}
 

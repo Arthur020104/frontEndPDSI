@@ -1,24 +1,32 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, StyleProp, TextStyle } from "react-native";
+import { View, Text, StyleSheet, StyleProp, TextStyle, Alert } from "react-native";
 import { ReservationCard, ReservationCardProps } from "./ReservationCard";
-
+import { fetchAPI } from "../screens/services/api";
 
 export type BackendResponse = ReservationCardProps[];
 
-function backendPlaceholder(): Promise<BackendResponse> 
+async function backendPlaceholder(): Promise<BackendResponse> 
 {
-    return Promise.resolve([{
-        name: "Reserva 1",
-        unavailableDates: ['04/09/2025', '05/09/2025'],
-        imgURL: "https://tocas-ui.com/5.0/en-us/assets/images/16-9.png",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer eleifend augue sed justo mattis..."
-    }]);
+    try
+    {
+        const data : BackendResponse = await fetchAPI('/reservas');
+        return data;
+    }
+    catch (err: any)
+    {
+        console.error('Error fetching reservations:', err);
+        Alert.alert('Erro', err?.message || 'Não foi possível conectar ao servidor');
+        return [];
+    }
+    
 }
 interface ReservationBodyProps 
 {
     styleTitle?: StyleProp<TextStyle>;
+    userId: number;
+    isSyndic: boolean;
 }
-export const ReservationBody: React.FC<ReservationBodyProps> = ({ styleTitle }) =>
+export const ReservationBody: React.FC<ReservationBodyProps> = ({ styleTitle , userId, isSyndic }) =>
 {
     const [reservations, setReservations] = useState<ReservationCardProps[]>([]);
 
@@ -33,10 +41,7 @@ export const ReservationBody: React.FC<ReservationBodyProps> = ({ styleTitle }) 
             {reservations.map((reservation, index) => (
                 <ReservationCard 
                     key={index}
-                    name={reservation.name}
-                    unavailableDates={reservation.unavailableDates}
-                    imgURL={reservation.imgURL}
-                    description={reservation.description}
+                    {...reservation}
                 />
             ))}
         </View>
