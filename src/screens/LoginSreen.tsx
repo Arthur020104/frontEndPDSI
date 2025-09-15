@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,17 @@ export default function LoginScreen({ navigation }: Props)
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  
+
+  // if before login @user set delete it
+  useEffect(() => 
+  {
+    const clearUser = async () => 
+    {
+      await AsyncStorage.removeItem('@user');
+    };
+    clearUser();
+  }, []);
 
   const handleLogin = async () =>
   {
@@ -51,9 +62,14 @@ export default function LoginScreen({ navigation }: Props)
 
       try
       {
-        const meData = await fetchAPI('/auth/me');
         await AsyncStorage.setItem('@user', 
-          JSON.stringify({ token: data.token, email: data.email, username: data.username, role: data.role, id: meData?.id }));
+          JSON.stringify({ token: data.token}));
+          
+        const meData = await fetchAPI('/auth/me');
+
+        await AsyncStorage.setItem('@user', 
+          JSON.stringify({ token: data.token, email: data.email, username: data.username, role: data.role, id: meData.id }));
+        
         if (meData && meData.isLinked)
         {
           navigation.navigate('Home');
