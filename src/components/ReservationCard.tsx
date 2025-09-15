@@ -419,7 +419,7 @@ export function ReservationCard(props: ReservationCardProps)
       {
         position: 'absolute',
         right: 0,
-        bottom: 0,
+        bottom: -10,
         padding: 8,
         zIndex: 101
       },
