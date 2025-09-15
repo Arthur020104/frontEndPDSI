@@ -16,6 +16,7 @@ import type { RulesBodyHandle } from '../components/RulesBody';
 import { FinanceBody } from '../components/FinanceBody';
 import type { FinanceBodyHandle } from '../components/FinanceBody';
 import { OccurrenceBody } from '../components/OccurrenceBody';
+import NoticesBody, { NoticesBodyHandle } from '../components/NoticesBody';
 import type { OccurrenceBodyHandle } from '../components/OccurrenceBody';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -41,6 +42,8 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
   const occurrenceRef = useRef<OccurrenceBodyHandle>(null);
   const rulesRef = useRef<RulesBodyHandle>(null);
   const financeRef = useRef<FinanceBodyHandle>(null);
+  const noticesRef = useRef<NoticesBodyHandle>(null);
+
 
   useEffect(() => 
   {
@@ -102,8 +105,12 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           )}
 
           {selectedMenu === 'Avisos' && (
-            <Text style={styles.placeholder}>Aqui vão os avisos do condomínio</Text>
-          )}
+            
+               <NoticesBody ref={noticesRef} isSyndic={userData?.role === 'syndic'} />
+
+
+)}
+
 
           {selectedMenu === 'Denúncia' && (
             <OccurrenceBody
@@ -132,6 +139,17 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
+
+        {selectedMenu === 'Avisos' && userData?.role === 'syndic' && (
+      <TouchableOpacity
+        style={styles.fab}
+        activeOpacity={0.9}
+        onPress={() => noticesRef.current?.openCreateModal()}
+      >
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
+    )}
+
 
       {selectedMenu === 'Regras' && userData?.role === 'syndic' && (
         <TouchableOpacity
