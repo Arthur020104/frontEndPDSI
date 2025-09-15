@@ -3,27 +3,21 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   FlatList,
+  TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from 'react-native';
-import { Header } from '../components/Header';
-import { ReservationBody} from '../components/ReservationBody';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import { Header } from '../components/Header';
+import { ReservationBody } from '../components/ReservationBody';
 import { RulesBody } from '../components/RulesBody';
-import type { RulesBodyHandle } from '../components/RulesBody';
 import { FinanceBody } from '../components/FinanceBody';
-import type { FinanceBodyHandle } from '../components/FinanceBody';
 import { OccurrenceBody } from '../components/OccurrenceBody';
 import NoticesBody, { NoticesBodyHandle } from '../components/NoticesBody';
-import type { OccurrenceBodyHandle } from '../components/OccurrenceBody';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface Props 
-{
-  navigation: any;
-}
 const menuOptions = [
   { id: 1, label: 'Reservas', icon: 'calendar' },
   { id: 2, label: 'Câmeras', icon: 'video' },
@@ -33,41 +27,49 @@ const menuOptions = [
   { id: 6, label: 'Regras', icon: 'book' },
 ];
 
-
 const cardWidth = 90;
-export const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
+export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
   const [selectedMenu, setSelectedMenu] = useState(menuOptions[0].label);
   const [userData, setUserData] = useState<any>(null);
-  const occurrenceRef = useRef<OccurrenceBodyHandle>(null);
-  const rulesRef = useRef<RulesBodyHandle>(null);
-  const financeRef = useRef<FinanceBodyHandle>(null);
+  const [filterToday, setFilterToday] = useState(false);
+
+  const occurrenceRef = useRef<any>(null);
+  const rulesRef = useRef<any>(null);
+  const financeRef = useRef<any>(null);
   const noticesRef = useRef<NoticesBodyHandle>(null);
 
-
-  useEffect(() => 
-  {
-    const loadUserData = async () => 
-    {
+  // Carrega usuário
+  useEffect(() => {
+    const loadUserData = async () => {
       const userString = await AsyncStorage.getItem('@user');
-      if (!userString) 
-      {
+      if (!userString) {
         Alert.alert('Erro', 'Usuário não logado. Faça login novamente.');
         navigation.navigate('Login');
         return;
       }
-      const user = JSON.parse(userString);
-      setUserData(user);
-      console.log('User Data:', user);
+      setUserData(JSON.parse(userString));
     };
-
     loadUserData();
   }, [navigation]);
 
+  // Lê params do Header (sino)
+  useEffect(() => {
+    if (route.params?.selectedMenu) {
+      setSelectedMenu(route.params.selectedMenu);
+      setFilterToday(!!route.params.filterToday);
+    }
+  }, [route.params]);
+
+  // Reseta filtro de hoje ao clicar manualmente no menu Avisos
+  useEffect(() => {
+    if (selectedMenu === 'Avisos') {
+      setFilterToday(false);
+    }
+  }, [selectedMenu]);
 
   const renderMenuItem = ({ item }: any) => {
     const isSelected = item.label === selectedMenu;
-
     return (
       <TouchableOpacity
         style={[styles.menuCard, isSelected && styles.menuCardSelected]}
@@ -80,11 +82,12 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-     <View style={styles.root}>
-  <Header username={userData?.username} navigation={navigation} />
+    <SafeAreaView style={styles.root}>
+      {/* Header */}
+      <Header username={userData?.username} navigation={navigation} />
 
       {/* Carrossel horizontal */}
-      <ScrollView>
+      <View style={{ height: 100 }}>
         <FlatList
           data={menuOptions}
           horizontal
@@ -93,84 +96,52 @@ export const HomeScreen: React.FC<Props> = ({ navigation }) => {
           contentContainerStyle={{ paddingLeft: 16, paddingVertical: 10 }}
           renderItem={renderMenuItem}
         />
+      </View>
 
-        {/* Conteúdo dinâmico */}
-        <View style={styles.scrollContent}>
-          {selectedMenu === 'Reservas' && (
-            <ReservationBody styleTitle={styles.titleComponent} userId={userData?.id} isSyndic={userData?.role === 'syndic'} />
-          )}
+      {/* Conteúdo principal */}
+      <View style={styles.contentContainer}>
+        {selectedMenu === 'Reservas' && <ReservationBody styleTitle={styles.titleComponent} userId={userData?.id} isSyndic={userData?.role === 'syndic'} />}
+        {selectedMenu === 'Câmeras' && <Text style={styles.placeholder}>Visualização das câmeras</Text>}
+        {selectedMenu === 'Avisos' && (
+          <NoticesBody
+            ref={noticesRef}
+            isSyndic={userData?.role === 'syndic'}
+            filter={filterToday ? 'today' : 'all'}
+          />
+        )}
+        {selectedMenu === 'Denúncia' && (
+          <OccurrenceBody ref={occurrenceRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
+        )}
+        {selectedMenu === 'Financeiro' && (
+          <FinanceBody ref={financeRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
+        )}
+        {selectedMenu === 'Regras' && (
+          <RulesBody ref={rulesRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
+        )}
+      </View>
 
-          {selectedMenu === 'Câmeras' && (
-            <Text style={styles.placeholder}>Visualização das câmeras</Text>
-          )}
-
-          {selectedMenu === 'Avisos' && (
-            
-               <NoticesBody ref={noticesRef} isSyndic={userData?.role === 'syndic'} />
-
-
-)}
-
-
-          {selectedMenu === 'Denúncia' && (
-            <OccurrenceBody
-              ref={occurrenceRef}
-              styleTitle={styles.titleComponent}
-              isSyndic={userData?.role === 'syndic'}
-            />
-          )}
-
-          {selectedMenu === 'Financeiro' && (
-            <FinanceBody ref={financeRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
-          )}
-
-          {selectedMenu === 'Regras' && (
-            <RulesBody ref={rulesRef} styleTitle={styles.titleComponent} isSyndic={userData?.role === 'syndic'} />
-          )}
-        </View>
-      </ScrollView>
-
+      {/* FABs */}
       {selectedMenu === 'Denúncia' && (
-        <TouchableOpacity
-          style={styles.fab}
-          activeOpacity={0.9}
-          onPress={() => occurrenceRef.current?.openCreateModal()}
-        >
+        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => occurrenceRef.current?.openCreateModal()}>
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
-
-        {selectedMenu === 'Avisos' && userData?.role === 'syndic' && (
-      <TouchableOpacity
-        style={styles.fab}
-        activeOpacity={0.9}
-        onPress={() => noticesRef.current?.openCreateModal()}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
-    )}
-
-
+      {selectedMenu === 'Avisos' && userData?.role === 'syndic' && (
+        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => noticesRef.current?.openCreateModal()}>
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
+      )}
       {selectedMenu === 'Regras' && userData?.role === 'syndic' && (
-        <TouchableOpacity
-          style={styles.fab}
-          activeOpacity={0.9}
-          onPress={() => rulesRef.current?.openCreateModal()}
-        >
+        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => rulesRef.current?.openCreateModal()}>
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
-
       {selectedMenu === 'Financeiro' && userData?.role === 'syndic' && (
-        <TouchableOpacity
-          style={styles.fab}
-          activeOpacity={0.9}
-          onPress={() => financeRef.current?.openCreateModal()}
-        >
+        <TouchableOpacity style={styles.fab} activeOpacity={0.9} onPress={() => financeRef.current?.openCreateModal()}>
           <Text style={styles.fabText}>+</Text>
         </TouchableOpacity>
       )}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -187,16 +158,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  menuCardSelected: {
-    backgroundColor: '#2e59d9',
-  },
-  menuLabel: {
-    color: '#fff',
-    marginTop: 6,
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  scrollContent: { padding: 16 },
+  menuCardSelected: { backgroundColor: '#2e59d9' },
+  menuLabel: { color: '#fff', marginTop: 6, fontSize: 12, textAlign: 'center' },
+  contentContainer: { flex: 1, paddingHorizontal: 16, paddingTop: 8 },
   placeholder: {
     fontSize: 16,
     padding: 16,
@@ -205,14 +169,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     textAlign: 'center',
   },
-  titleComponent: {
-    fontSize: 25,
-    fontWeight: '400',
-    marginBottom: 12,
-    textAlign: 'center',
-    color: '#333',
-
-  },
+  titleComponent: { fontSize: 25, fontWeight: '400', marginBottom: 12, textAlign: 'center', color: '#333' },
   fab: {
     position: 'absolute',
     right: 20,
@@ -226,9 +183,5 @@ const styles = StyleSheet.create({
     elevation: 6,
     zIndex: 10,
   },
-  fabText: {
-    color: '#fff',
-    fontSize: 30,
-    marginTop: -2,
-  },
+  fabText: { color: '#fff', fontSize: 30, marginTop: -2 },
 });
