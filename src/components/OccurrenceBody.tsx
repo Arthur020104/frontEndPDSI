@@ -83,21 +83,23 @@ export function formatDate(iso: string): string
 
 interface OccurrenceBodyProps
 {
-	styleTitle?: StyleProp<TextStyle>;
-	isSyndic?: boolean;
+  styleTitle?: StyleProp<TextStyle>;
+  isSyndic?: boolean;
+  currentUserId: number;
 }
 export type OccurrenceBodyHandle = { openCreateModal: () => void };
 
-export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyProps>(function OccurrenceBody({ styleTitle, isSyndic }, ref)
+export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyProps>(function OccurrenceBody({ styleTitle, isSyndic, currentUserId }, ref)
 {
 	const [items, setItems] = useState<OccurrenceItem[]>([]);
 	const [showModal, setShowModal] = useState(false);
 	const [newTitle, setNewTitle] = useState('');
 	const [newDesc, setNewDesc] = useState('');
 	const [userData, setUserData] = useState<any>(null);
+	const [displayOccurrenceFollowUp, setDisplayOccurrenceFollowUp] = useState(false);
   	
 	
-  
+  console.log(JSON.stringify(items));
 	const loadData = async () => 
 	{
 		const data = await fetchOccurrences();
@@ -127,9 +129,20 @@ export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyPro
 								{
 									await disableOcurrence(item.id);
 									loadData();
+                  
 								}}>
 									<Icon name="trash-can-outline" size={20} color="#E53935" />
 								</TouchableOpacity>
+							)}
+              {item.user_id == currentUserId  && (
+                <TouchableOpacity
+                  onPress={async () => {
+                    setDisplayOccurrenceFollowUp(true);
+                  }}
+                  style={{ paddingVertical: 6, paddingHorizontal: 10, backgroundColor: '#3967ffff', borderRadius: 6 }}
+                >
+                  <Text style={{ color: '#ffffff', fontWeight: '600' }}>Acompanhar ocorrencia</Text>
+                </TouchableOpacity>
 							)}
 						</View>
 					}
@@ -146,6 +159,7 @@ export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyPro
 							</Text>
 						</View>
 					</View>
+
 				</Card>
 			))}
 
@@ -197,157 +211,229 @@ export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyPro
 					</View>
 				</View>
 			</Modal>
+      <Modal
+      visible={displayOccurrenceFollowUp}
+      transparent
+      animationType="fade"
+      onRequestClose={() => {}}
+      >
+      <View style={styles.modalOverlay}>
+      <View style={styles.modalCard}>
+      <Text style={styles.modalTitle}>Acompanhar Ocorrência</Text>
+      {/* Placeholder for chat interface */}
+      <Text style={styles.text}>Situação atual: Em análise pelo síndico.</Text>
+      <View style={styles.chatContainer}>
+        <Text style={styles.chatTitle}>Comentários:</Text>
+        <View style={styles.chatMessage}>
+          <Text style={styles.chatUser}>Síndico:</Text>
+          <Text style={styles.chatText}>Estamos analisando a ocorrência.</Text>
+        </View>
+        <View style={styles.chatMessage}>
+          <Text style={styles.chatUser}>Usuário:</Text>
+          <Text style={styles.chatText}>Obrigado pela atualização.</Text>
+        </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Adicionar comentário..."
+          multiline
+        />
+        <TouchableOpacity style={[styles.modalButton, styles.btnPrimary]}>
+          <Text style={styles.modalButtonTextPrimary}>Enviar</Text>
+        </TouchableOpacity>
+      </View>
+
+      </View>
+      </View>
+      </Modal>
+
 		</View>
 	);
 });
 
 const styles = StyleSheet.create(
 {
-	container:
-	{
-			width: '100%'
-	},
-	title:
-	{
-		fontSize: 22,
-		fontWeight: '600',
-		marginBottom: 12,
-		color: '#0058A3'
-	},
-	footerRow:
-	{
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		marginTop: 12,
-		width: '100%'
-	},
-	footerText:
-	{
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'flex-end',
-		marginTop: 12
-	},
-	avatar:
-	{
-		width: 36,
-		height: 36,
-		borderRadius: 18,
-		backgroundColor: '#eee',
-		borderWidth: 2,
-		borderColor: '#0058A3'
-	},
-	text:
-	{
-		fontSize: 15,
-		color: '#333',
-		lineHeight: 22,
-		textAlign: 'center',
-		padding: 6
-	},
-	meta:
-	{
-		fontSize: 12,
-		color: '#777',
-		textAlign: 'left'
-	},
-	headerRow:
-	{
-		flexDirection: 'row',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		gap: 8,
-		width: '100%'
-	},
-	cardTitleText:
-	{
-		fontSize: 16,
-		fontWeight: '600',
-		color: '#000',
-		flex: 1,
-		marginRight: 8
-	},
-	modalOverlay:
-	{
-		flex: 1,
-		backgroundColor: 'rgba(0,0,0,0.35)',
-		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	modalCard:
-	{
-		width: '90%',
-		backgroundColor: '#fff',
-		borderRadius: 12,
-		padding: 16
-	},
-	modalTitle:
-	{
-		fontSize: 18,
-		fontWeight: '600',
-		color: '#0058A3',
-		marginBottom: 12
-	},
-	input:
-	{
-		borderWidth: 1,
-		borderColor: '#ddd',
-		borderRadius: 8,
-		paddingHorizontal: 12,
-		height: 48,
-		backgroundColor: '#fff',
-		marginBottom: 10
-	},
-	textarea:
-	{
-		height: 110,
-		textAlignVertical: 'top'
-	},
-	cardInner:
-	{
-		position: 'relative'
-	},
-	deleteBtn:
-	{
-		position: 'absolute',
-		top: 6,
-		right: 6,
-		padding: 6
-	},
-	modalActions:
-	{
-		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		marginTop: 8
-	},
-	modalButton:
-	{
-		paddingVertical: 10,
-		paddingHorizontal: 14,
-		borderRadius: 8,
-		borderWidth: 1
-	},
-	btnCancel:
-	{
-		borderColor: '#ddd',
-		marginRight: 10
-	},
-	btnPrimary:
-	{
-		backgroundColor: '#0058A3',
-		borderColor: '#0058A3'
-	},
-	modalButtonText:
-	{
-		color: '#333',
-		fontSize: 14
-	},
-	modalButtonTextPrimary:
-	{
-		color: '#fff',
-		fontSize: 14,
-		fontWeight: '600'
-	}
+  container:
+  {
+      width: '100%'
+  },
+  title:
+  {
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 12,
+    color: '#0058A3'
+  },
+  footerRow:
+  {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+    width: '100%'
+  },
+  footerText:
+  {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginTop: 12
+  },
+  avatar:
+  {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#eee',
+    borderWidth: 2,
+    borderColor: '#0058A3'
+  },
+  text:
+  {
+    fontSize: 15,
+    color: '#333',
+    lineHeight: 22,
+    textAlign: 'center',
+    padding: 6
+  },
+  meta:
+  {
+    fontSize: 12,
+    color: '#777',
+    textAlign: 'left'
+  },
+  headerRow:
+  {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+    width: '100%'
+  },
+  cardTitleText:
+  {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#000',
+    flex: 1,
+    marginRight: 8
+  },
+  modalOverlay:
+  {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalCard:
+  {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16
+  },
+  modalTitle:
+  {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0058A3',
+    marginBottom: 12
+  },
+  input:
+  {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 48,
+    backgroundColor: '#fff',
+    marginBottom: 10
+  },
+  textarea:
+  {
+    height: 110,
+    textAlignVertical: 'top'
+  },
+  cardInner:
+  {
+    position: 'relative'
+  },
+  deleteBtn:
+  {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    padding: 6
+  },
+  modalActions:
+  {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 8
+  },
+  modalButton:
+  {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    borderWidth: 1
+  },
+  btnCancel:
+  {
+    borderColor: '#ddd',
+    marginRight: 10
+  },
+  btnPrimary:
+  {
+    backgroundColor: '#0058A3',
+    borderColor: '#0058A3'
+  },
+  modalButtonText:
+  {
+    color: '#333',
+    fontSize: 14
+  },
+  modalButtonTextPrimary:
+  {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600'
+  },
+  chatContainer:
+  {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    paddingTop: 12
+  },
+  chatTitle:
+  {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0058A3',
+    marginBottom: 12
+  },
+  chatMessage:
+  {
+    marginBottom: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#0058A3'
+  },
+  chatUser:
+  {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0058A3',
+    marginBottom: 4
+  },
+  chatText:
+  {
+    fontSize: 13,
+    color: '#333',
+    lineHeight: 18
+  }
 });
 

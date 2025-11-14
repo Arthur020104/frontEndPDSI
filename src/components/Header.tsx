@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface HeaderProps {
   username: string;
@@ -23,6 +24,16 @@ export const Header: React.FC<HeaderProps> = ({ username, navigation }) => {
 
       <TouchableOpacity onPress={() => navigation.navigate('Profile')}>
         <Text style={styles.profileRedirect}>{`Ver meu perfil >`}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={async () =>
+        {
+          try { await AsyncStorage.removeItem('@user'); } catch (_) {}
+          navigation.navigate('Login');
+        }}
+      >
+        <Text style={styles.logout}>{`< Sair`}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -56,11 +67,19 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   profileRedirect: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#00457E',
+    color: '#00508F',
     textAlign: 'left',
     marginLeft: 16,
     marginTop: 4,
+  },
+  logout: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#00457E',
+    textAlign: 'left',
+    marginLeft: 16,
+    marginTop: 6,
   },
 });

@@ -147,6 +147,7 @@ export const HomeScreen: React.FC<any> = ({ navigation, route }) => {
               ref={occurrenceRef}
               styleTitle={styles.titleComponent}
               isSyndic={userData?.role === 'syndic'}
+              currentUserId={userData?.id}
             />
           </ScrollView>
         )}
