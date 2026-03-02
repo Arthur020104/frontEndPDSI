@@ -10,7 +10,8 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fetchAPI } from '../screens/services/api';
+import { fetchAPI } from '../services/api';
+import { formatDate } from '../utils/formatDate';
 
 export type NoticesBodyHandle = { openCreateModal: () => void };
 
@@ -28,10 +29,7 @@ interface NoticesBodyProps {
   filter?: 'all' | 'today';
 }
 
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR');
-};
+
 
 export const NoticesBody = forwardRef<NoticesBodyHandle, NoticesBodyProps>(
   ({ styleTitle, isSyndic, filter = 'all' }, ref) => {

@@ -1,19 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, FlatList, TextInput } from 'react-native';
 import { Card } from './Card';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { getImageUrl } from '../screens/services/api';
-import { fetchAPI } from '../screens/services/api';
+import { Calendar } from 'react-native-calendars';
+import '../utils/calendarLocale';
+import { getImageUrl, fetchAPI } from '../services/api';
 
-LocaleConfig.locales['pt-br'] =
-{
-  monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  monthNamesShort: ['Jan.','Fev.','Mar.','Abr.','Mai.','Jun.','Ago.','Set.','Out.','Nov.','Dez.'],
-  dayNames: ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'],
-  dayNamesShort: ['Dom.','Seg.','Ter.','Qua.','Qui.','Sex.','Sáb.'],
-  today: 'Hoje'
-};
-LocaleConfig.defaultLocale = 'pt-br';
+
 
 export interface ReservationCardProps
 {

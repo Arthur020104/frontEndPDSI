@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchAPI } from './services/api';
+import { fetchAPI } from '../services/api';
 
 interface Props {
   navigation: any;

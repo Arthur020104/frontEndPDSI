@@ -1,13 +1,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 
-interface CardProps {
+interface CardProps
+{
   title: React.ReactNode;
   children?: React.ReactNode;
   style?: ViewStyle;
 }
 
-export const Card: React.FC<CardProps> = ({ title, children, style }) => {
+export const Card: React.FC<CardProps> = ({ title, children, style }) =>
+{
   return (
     <View style={[styles.card, style]}>
       <View style={styles.header}>
@@ -23,7 +25,8 @@ export const Card: React.FC<CardProps> = ({ title, children, style }) => {
 };
 
 const styles = StyleSheet.create({
-  card: {
+  card:
+  {
     width: '100%',
     backgroundColor: '#fff',
     borderRadius: 12,
@@ -37,18 +40,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e0e0e0'
   },
-  header: {
+  header:
+  {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 8
   },
-  cardTitle: {
+  cardTitle:
+  {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 0,
+    marginBottom: 0
   },
-  content: {
-    // space for children
+  content:
+  {
   }
 });

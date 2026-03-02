@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, StyleProp, TextStyle, TouchableOpacity, Modal, 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Card } from './Card';
-import { formatDate } from './OccurrenceBody';
-import { fetchAPI } from '../screens/services/api';
+import { formatDate } from '../utils/formatDate';
+import { fetchAPI } from '../services/api';
 
 type Rule = 
 {

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Alert,
   StyleSheet,
@@ -11,12 +10,14 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
-  ActivityIndicator,
+  ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { fetchAPI } from '../services/api';
+import { registerUser } from '../services/authService';
+import { InputField } from '../components/InputField';
 
-interface Props {
+interface Props
+{
   navigation: any;
 }
 
@@ -40,13 +41,7 @@ export default function RegisterScreen({ navigation }: Props)
     try
     {
       setLoading(true);
-      await fetchAPI('/auth/register', 'POST',
-      {
-        name: username,
-        email,
-        password,
-        role: isSyndic ? 'syndic' : 'resident'
-      });
+      await registerUser(username, email, password, isSyndic ? 'syndic' : 'resident');
       Alert.alert('Sucesso', 'Conta criada com sucesso!');
       navigation.navigate('Login');
     }
@@ -73,37 +68,29 @@ export default function RegisterScreen({ navigation }: Props)
           <Text style={styles.title}>Bem-vindo ao CondoApp</Text>
           <Text style={styles.subtitle}>Registre-se para acessar</Text>
 
-          <View style={styles.inputContainer}>
-            <Icon name="account" size={20} color="#888" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Nome de usuário"
-              value={username}
-              onChangeText={setUsername}
-            />
-          </View>
+          <InputField
+            iconName="account"
+            placeholder="Nome de usuário"
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="words"
+          />
 
-          <View style={styles.inputContainer}>
-            <Icon name="email" size={20} color="#888" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-            />
-          </View>
+          <InputField
+            iconName="email"
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+          />
 
-          <View style={styles.inputContainer}>
-            <Icon name="lock" size={20} color="#888" style={styles.icon} />
-            <TextInput
-              style={styles.input}
-              placeholder="Senha"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
-          </View>
+          <InputField
+            iconName="lock"
+            placeholder="Senha"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
           <View style={styles.adminRow}>
             <TouchableOpacity
@@ -141,43 +128,58 @@ export default function RegisterScreen({ navigation }: Props)
 }
 
 const styles = StyleSheet.create({
-  container: {
+  container:
+  {
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f9f9f9'
   },
-  title: {
+  title:
+  {
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 5,
     alignSelf: 'center',
-    color: '#2c3e50',
+    color: '#2c3e50'
   },
-  subtitle: {
+  subtitle:
+  {
     fontSize: 16,
     marginBottom: 20,
     alignSelf: 'center',
-    color: '#7f8c8d',
+    color: '#7f8c8d'
   },
-  inputContainer: {
+  adminRow:
+  {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    marginBottom: 16
+  },
+  adminToggle:
+  {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     borderWidth: 1,
     borderColor: '#ddd',
-    paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10
   },
-  icon: { marginRight: 10 },
-  input: { flex: 1, height: 50 },
-  button: {
+  adminToggleActive:
+  {
+    backgroundColor: '#0058A3',
+    borderColor: '#0058A3'
+  },
+  adminLabel:
+  {
+    fontSize: 15,
+    color: '#444'
+  },
+  button:
+  {
     backgroundColor: '#2980b9',
     height: 50,
     borderRadius: 8,
@@ -188,42 +190,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 3,
-    elevation: 3,
+    elevation: 3
   },
-  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
-  loginLink: {
+  buttonText:
+  {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  loginLink:
+  {
     marginTop: 15,
-    alignSelf: 'center',
+    alignSelf: 'center'
   },
-  loginText: {
+  loginText:
+  {
     color: '#2980b9',
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  adminRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 4,
-  },
-  adminToggle: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
-    elevation: 2,
-  },
-  adminToggleActive: {
-    backgroundColor: '#2980b9',
-    borderColor: '#2980b9',
-  },
-  adminLabel: {
-    fontSize: 14,
-    color: '#2c3e50',
-  },
+    fontWeight: 'bold'
+  }
 });

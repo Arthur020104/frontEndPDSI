@@ -2,7 +2,7 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle } from "rea
 import { View, Text, StyleSheet, StyleProp, TextStyle, Alert, Modal, TouchableOpacity, TextInput, Image } from "react-native";
 import * as ImagePicker from 'expo-image-picker';
 import { ReservationCard, ReservationCardProps } from "./ReservationCard";
-import { fetchAPI } from "../screens/services/api";
+import { fetchAPI } from '../services/api';
 
 export type BackendResponse = ReservationCardProps[];
 

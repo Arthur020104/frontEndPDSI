@@ -2,7 +2,8 @@ import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'rea
 import { View, Text, StyleSheet, Image, StyleProp, TextStyle, TouchableOpacity, Modal, TextInput } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Card } from './Card';
-import { fetchAPI } from '../screens/services/api';
+import { fetchAPI } from '../services/api';
+import { formatDate } from '../utils/formatDate';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -126,14 +127,7 @@ async function sendMessage(occurrenceId: number, content: string, senderId: numb
     return null;
   }
 }
-export function formatDate(iso: string): string
-{
-	const d = new Date(iso);
-	const dd = String(d.getDate()).padStart(2, '0');
-	const mm = String(d.getMonth() + 1).padStart(2, '0');
-	const yyyy = d.getFullYear();
-	return `${dd}/${mm}/${yyyy}`;
-}
+
 
 interface OccurrenceBodyProps
 {
@@ -170,8 +164,7 @@ export const OccurrenceBody = forwardRef<OccurrenceBodyHandle, OccurrenceBodyPro
     );
     setItems(itemsWithMessages);
   };
-  
-  //updating the modal of message every 1 second when it's open
+
   useEffect(() =>
   {
     let interval: NodeJS.Timeout;

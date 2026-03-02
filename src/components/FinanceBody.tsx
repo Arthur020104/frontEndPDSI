@@ -1,20 +1,14 @@
 import React, { useEffect, useMemo, useState, forwardRef, useImperativeHandle } from 'react';
 import { View, Text, StyleSheet, StyleProp, TextStyle, TouchableOpacity, Modal, TextInput, Alert, Pressable } from 'react-native';
 import { Card } from './Card';
-import { fetchAPI } from '../screens/services/api'; 
-import { formatDate } from './OccurrenceBody';
+import { fetchAPI } from '../services/api';
+import { formatDate } from '../utils/formatDate';
+import { isValidBrazilianCurrency, parseBrazilianCurrency } from '../utils/currency';
+import '../utils/calendarLocale';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Calendar, LocaleConfig } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 
-// Locale for calendar
-LocaleConfig.locales['pt-br'] = {
-  monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  monthNamesShort: ['Jan.','Fev.','Mar.','Abr.','Mai.','Jun.','Ago.','Set.','Out.','Nov.','Dez.'],
-  dayNames: ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'],
-  dayNamesShort: ['Dom.','Seg.','Ter.','Qua.','Qui.','Sex.','Sáb.'],
-  today: 'Hoje'
-};
-LocaleConfig.defaultLocale = 'pt-br';
+
 type Installment =
 {
   id: number | string;
@@ -84,18 +78,7 @@ async function payCharge(id: number): Promise<boolean>
     return false;
   }
 }
-function onBrazilianStandard(value: string): boolean
-{
-  const regex = /^(?!0\.000)(?:\d{1,3}(?:\.\d{3})*|\d+)(?:,\d{1,2})?$/;
-  return regex.test(value);
-}
-function toNumberFromBrazilianStandard(value: string): number
-{
-  // Remove all dots and replace comma with dot
-  const normalized = value.replace(/\./g, '').replace(',', '.');
-  const n = parseFloat(normalized);
-  return isNaN(n) ? 0 : n;
-}
+
 interface FinanceBodyProps
 {
   styleTitle?: StyleProp<TextStyle>;
@@ -337,12 +320,12 @@ export const FinanceBody = forwardRef<FinanceBodyHandle, FinanceBodyProps>(funct
                     Alert.alert('Aviso', 'Preencha código, valor e vencimento.');
                     return;
                   }
-                  if (!onBrazilianStandard(valueInput))
+                  if (!isValidBrazilianCurrency(valueInput))
                   {
                     Alert.alert('Aviso', 'Valor em formato inválido para o padrão brasileiro.');
                     return;
                   }
-                  const transformedValue = toNumberFromBrazilianStandard(valueInput);
+                  const transformedValue = parseBrazilianCurrency(valueInput);
                   const ok = await createFinanceCharge(selectedCode, transformedValue, dueDateInput, allCondo ? 'all' : 'single', allCondo ? undefined : parseInt(userId));
                   if (ok) 
                   {
@@ -505,7 +488,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '600'
   },
-  // Modal styles (reused pattern)
   modalOverlay:
   {
     flex: 1,
